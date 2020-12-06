@@ -1,4 +1,4 @@
-import { authService } from "fbase";
+import { authService, firebaseInstance } from "fbase";
 import React, { useState } from "react";
 
 const Auth = () => {
@@ -28,7 +28,7 @@ const Auth = () => {
                 data = await authService.createUserWithEmailAndPassword(email, password);
             }
             else {
-                // log in
+                // Sign In
                 data = await authService.signInWithEmailAndPassword(email, password);
             }
             console.log(data);
@@ -37,7 +37,24 @@ const Auth = () => {
             setError(error.message);
         }
     };
-    const toggleAccount = () => setNewAccount(prev => !prev);
+
+    // 회원가입 - 로그인 전환 버튼 
+    const toggleAccount = () => setNewAccount(prev => !prev); // true->false / false->true
+
+    // 소셜 로그인 
+    const onSocialClick = async (event) => {
+        const { target: { name } } = event; //es6문법
+        let provider; //firebase pup-up을 사용하기 위해서는 provider를 선언해줘야함
+        if (name == "google") {
+            provider = new firebaseInstance.auth.GoogleAuthProvider();
+        }
+        else if (name == "github") {
+            provider = new firebaseInstance.auth.GithubAuthProvider();
+        }
+        await authService.signInWithPopup(provider);
+        console.log(provider);
+
+    }
 
     return (
         <div>
@@ -45,13 +62,13 @@ const Auth = () => {
 
                 <input name="email" type="email" placeholder="Email" required value={email} onChange={onChange} />
                 <input name="password" type="password" placeholder="password" required value={password} onChange={onChange} />
-                <input type="submit" value={newAccount ? "Create Account" : "Log in"} />
+                <input type="submit" value={newAccount ? "Create Account" : "Sign In"} />
                 {error}
             </form>
-            <span onClick={toggleAccount}>{newAccount ? "Log in" : "Create Account"}</span>
+            <span onClick={toggleAccount}>{newAccount ? "Sign In" : "Create Account"}</span>
             <div>
-                <button>Google</button>
-                <button>GitHub</button>
+                <button onClick={onSocialClick} name="google">Continue with Google</button >
+                <button onClick={onSocialClick} name="github">Continue with GitHub</button>
             </div>
         </div>
     )
