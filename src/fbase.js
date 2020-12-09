@@ -1,5 +1,10 @@
 import * as firebase from "firebase/app";
-import "firebase/auth";
+import "firebase/auth"; //사용자인증 - 로그인
+import "firebase/firestore"; //데이터베이스(파베는 NoSQL DB)
+
+
+//NoSql 구조 : 1. Collection(폴더)  2. Document(문서)
+//Collection은 여러개의 Doucment의 그룹임
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_API_KEY,
@@ -17,3 +22,4 @@ firebase.initializeApp(firebaseConfig);
 export const firebaseInstance = firebase;
 
 export const authService = firebase.auth();
+export const dbService = firebase.firestore(); 

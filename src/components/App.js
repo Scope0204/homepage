@@ -5,10 +5,14 @@ import { authService } from "fbase";
 function App() {
     const [init, setInit] = useState(false); // 파이어베이스가 프로그램을 아직 초기화하지않음 -> 초기화 기다림
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userObj, setUserObj] = useState(null);
+
+
     useEffect(() => {
         authService.onAuthStateChanged((user) => {  // auth sdk , onAuthStateChanged() : 유저 상태 변화를 알아차리는 메서드 
             if (user) {
                 setIsLoggedIn(true);
+                setUserObj(user); //로그인한 유저정보
             }
             else {
                 setIsLoggedIn(false);
@@ -19,7 +23,7 @@ function App() {
 
     return (
         <>
-            {init ? <AppRouter isLoggedIn={isLoggedIn} /> : "Initializing..."}
+            {init ? <AppRouter isLoggedIn={isLoggedIn} userObj={userObj} /> : "Initializing..."}
             <footer>&copy; {new Date().getFullYear()} Homepage</footer>
         </>
     );
