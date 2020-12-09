@@ -1,5 +1,7 @@
-import { dbService } from "fbase";
+import { dbService, storageService } from "fbase";
 import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 const Nweet = ({ nweetObj, isOwner }) => {
 
@@ -14,6 +16,7 @@ const Nweet = ({ nweetObj, isOwner }) => {
             //doc(`컬렉션이름/도큐먼트id`).delete()
             //D(Delete) 
             await dbService.doc(`nweets/${nweetObj.id}`).delete();
+            await storageService.refFromURL(nweetObj.attachmentUrl).delete(); // 레퍼런트에서 url을 얻는 방법 - 사진 삭제
         }
     };
 
@@ -29,39 +32,48 @@ const Nweet = ({ nweetObj, isOwner }) => {
             text: newNweet // newNweet : input에 작성한 text
         });
         setEditing(false); // 수정모드를 풀기위해서
-    }
+    };
+
     const onChange = (event) => {
         const {
             target: { value },
         } = event;
         setNewNweet(value);
-    }
+    };
 
     return (
-        <div>
+        <div className="nweet">
             {editing ? (
                 <>
-                    <form onSubmit={onSubmit}>
+                    <form onSubmit={onSubmit} className="container nweetEdit">
                         <input
                             type="text"
                             placeholder="Edit your nweet"
                             value={newNweet}
                             required
+                            autoFocus
                             onChange={onChange}
+                            className="formInput"
                         />
-                        <input type="submit" value="Update Nweet" />
+                        <input type="submit" value="Update Nweet" className="formBtn" />
                     </form>
-                    <button onClick={toggleEditing}>Cancel</button>
+                    <span onClick={toggleEditing} className="formBtn cancelBtn">
+                        Cancel
+          </span>
                 </>
-            )
-                : (
+            ) : (
                     <>
                         <h4>{nweetObj.text}</h4>
+                        {nweetObj.attachmentUrl && <img src={nweetObj.attachmentUrl} />}
                         {isOwner && (
-                            <>
-                                <button onClick={onDeleteClick}>Delete</button>
-                                <button onClick={toggleEditing}>Edit</button>
-                            </>
+                            <div class="nweet__actions">
+                                <span onClick={onDeleteClick}>
+                                    <FontAwesomeIcon icon={faTrash} />
+                                </span>
+                                <span onClick={toggleEditing}>
+                                    <FontAwesomeIcon icon={faPencilAlt} />
+                                </span>
+                            </div>
                         )}
                     </>
                 )

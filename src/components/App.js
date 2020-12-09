@@ -12,19 +12,35 @@ function App() {
         authService.onAuthStateChanged((user) => {  // auth sdk , onAuthStateChanged() : 유저 상태 변화를 알아차리는 메서드 
             if (user) {
                 setIsLoggedIn(true);
-                setUserObj(user); //로그인한 유저정보
+                setUserObj({
+                    displayName: user.displayName,
+                    uid: user.uid,
+                    updateProfile: (args) => user.updateProfile(args),
+                });
             }
             else {
-                setIsLoggedIn(false);
+                setUserObj(null);
             }
             setInit(true);
         });
     }, []); // serEffect() : hook , user의 변화에 따라 변경 (로그인 됫는지안됫는지)
+    const refreshUser = () => {
+        const user = authService.currentUser;
+        setUserObj({
+            displayName: user.displayName,
+            uid: user.uid,
+            updateProfile: (args) => user.updateProfile(args),
+        });
+    };
+
 
     return (
         <>
-            {init ? <AppRouter isLoggedIn={isLoggedIn} userObj={userObj} /> : "Initializing..."}
-            <footer>&copy; {new Date().getFullYear()} Homepage</footer>
+            {init ? <AppRouter
+                refreshUser={refreshUser}
+                isLoggedIn={Boolean(userObj)}
+                userObj={userObj}
+            /> : "초기화 중..."}
         </>
     );
 }
